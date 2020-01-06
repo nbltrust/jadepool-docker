@@ -36,14 +36,22 @@ services:
         timeout: 5s
         retries: 5
 
+  saas-consul:
+    image: 'consul'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-consul'
+    restart: on-failure
+    logging:
+      driver: "none"
+
   saas-role-service:
-    image: 'jadepool-service-role:V0.1.5'
+    image: 'jadepool-service-role:0.1.5'
     network_mode: 'service:saas-postgres'
     container_name: 'saas-role-service'
     volumes:
       - './initSaasRole:/usr/src/app/initSaasRole'
-    onrun:
-      - 'cd initSaasRole && npm i && node upsert.js && node upsert.js saas-admin'
+    environment:
+        - WAIT_HOSTS=saas-consul:8500
   
   saas-backend:
     image: 'saas-backend:V1.12.1'
@@ -59,7 +67,7 @@ services:
         timeout: 10s
         retries: 5
     environment:
-        - WAIT_HOSTS=127.0.0.1:5432
+        - WAIT_HOSTS=127.0.0.1:5432, saas-role-service:6666
 
   # saas-frontend:
   #   image: '121.196.217.176:5000/saas/saas-frontend:V1.1.0'
