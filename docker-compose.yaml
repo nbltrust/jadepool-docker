@@ -11,7 +11,7 @@ services:
       - 8092:8092
       - 8093:8093
       - 8094:8094
-      - 3003:3003
+      - 3003:80
       - 3009:3009
       - 27017:27017
       - 7001:7001
@@ -152,23 +152,23 @@ services:
       - NODE_ENV=dev
     depends_on:
       - jadepool-api
-  jadepool-bn-agent:
-    image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-bn:0.13.0-alpha.3'
-    container_name: 'jadepool-bn-agent'
-    network_mode: 'service:saas-postgres'
-    restart: on-failure
-    environment:
-      - NODE_ENV=dev
-      - JP_MODE=app
-      - JP_PARAM=agent
-      - JP_HOST=127.0.0.1
-      - JP_AUTO_START=false
-      - WAIT_HOSTS=127.0.0.1:27017
-    depends_on:
-      - jadepool-mongodb
-      - jadepool-seed
-      - jadepool-callback
-      - jadepool-bn
-    volumes:
-      - '/data/logs-agent/logs:/usr/src/app/logs:rw'
-      - '/data/logs-agent-pm2/logs:/root/.pm2/logs:rw'
+  # jadepool-bn-agent:
+  #   image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-bn:0.13.0-alpha.3'
+  #   container_name: 'jadepool-bn-agent'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=dev
+  #     - JP_MODE=app
+  #     - JP_PARAM=agent
+  #     - JP_HOST=127.0.0.1
+  #     - JP_AUTO_START=false
+  #     - WAIT_HOSTS=127.0.0.1:27017
+  #   depends_on:
+  #     - jadepool-mongodb
+  #     - jadepool-seed
+  #     - jadepool-callback
+  #     - jadepool-bn
+  #   volumes:
+  #     - '/data/logs-agent/logs:/usr/src/app/logs:rw'
+  #     - '/data/logs-agent-pm2/logs:/root/.pm2/logs:rw'
