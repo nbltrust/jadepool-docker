@@ -6,6 +6,7 @@ services:
     ports:
       - 5432:5432
       - 6379:6379
+      - 27017:27017
       - 8500:8500
       - 8091:8091
       - 8092:8092
@@ -27,6 +28,20 @@ services:
         - POSTGRES_PASSWORD=123456
         - POSTGRES_DB=saas
 
+  saas-mongodb:
+    image: 'mongo:3.6'
+    container_name: 'saas-mongodb'
+    network_mode: 'service:saas-postgres'
+    restart: on-failure
+    volumes:
+      - '/data/db-data/configdb:/data/configdb:rw'
+      - '/data/db-data/db:/data/db:rw'
+    healthcheck:
+        test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    
   saas-redis:
     image: 'redis'
     network_mode: 'service:saas-postgres'
