@@ -1,0 +1,174 @@
+version: '3.5'
+services:
+  saas-postgres:
+    image: 'postgres'
+    network_mode: 'bridge'
+    ports:
+      - 8500:8500
+      - 5432:5432
+      - 6379:6379
+      - 8091:8091
+      - 8092:8092
+      - 8093:8093
+      - 8094:8094
+      - 3003:3003
+      - 3009:3009
+      - 27017:27017
+      - 7001:7001
+      - 7002:7002
+      - 7443:7443
+      - 7444:7444
+      - 3000:3000
+    container_name: 'saas-postgres'
+    volumes:
+      - '/data/db-postgres/db:/var/lib/postgresql/data/:rw'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+        - POSTGRES_USER=saas
+        - POSTGRES_PASSWORD=123456
+        - POSTGRES_DB=saas
+  saas-redis:
+    image: 'redis'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-redis'
+    healthcheck:
+        test: ["CMD", "redis-cli","ping"]
+        interval: 30s
+        timeout: 5s
+        retries: 5
+  saas-consul:
+    image: 'consul'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-consul'
+    restart: on-failure
+    logging:
+      driver: "none"
+  saas-backend:
+    image: 'saas-backend:V1.12.1'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-backend'
+    restart: on-failure
+    volumes:
+      - '/data/logs-saas:/usr/src/app/log'
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8091/api/test"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    environment:
+        - WAIT_HOSTS=127.0.0.1:5432, 127.0.0.1:6666
+  saas-frontend:
+    image: 'saas-frontend:V1.12.0'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-frontend'
+    depends_on:
+      - saas-backend
+  saas-superadmin:
+    image: 'saas-superadmin:V1.12.0'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-superadmin'
+    depends_on:
+      - saas-backend
+  saas-role:
+    image: 'saas-role:V0.5.0'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-role'
+    environment:
+        - WAIT_HOSTS=127.0.0.1:6379, 127.0.0.1:27017
+        - NODE_ENV=dev
+  jadepool-mongodb:
+    image: 'mongo:3.6'
+    container_name: 'jadepool-mongodb'
+    network_mode: 'service:saas-postgres'
+    restart: on-failure
+    volumes:
+      - '/data/db-data/configdb:/data/configdb:rw'
+      - '/data/db-data/db:/data/db:rw'
+    healthcheck:
+        test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+        interval: 30s
+        timeout: 10s
+        retries: 5
+  # jadepool-seed:
+  #   image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-seed:R1.2.1.190121'
+  #   container_name: 'jadepool-seed'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   volumes:
+  #     - '/data/seed-data:/usr/app/data:rw'
+  # jadepool-callback:
+  #   image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-callback:1.0.0'
+  #   container_name: 'jadepool-callback'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   volumes:
+  #     - '/data/logs-callback:/usr/src/app/logs:rw'
+  #   healthcheck:
+  #       test: ["CMD", "curl", "-X", "POST" , "http://localhost:9008"]
+  #       interval: 30s
+  #       timeout: 10s
+  #       retries: 5
+  # jadepool-bn:
+  #   image: '121.196.217.176:5000/jadepool/jadepool-bn:0.11.27-hotfix.1'
+  #   container_name: 'jadepool-bn'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=dev
+  #     - JP_MODE=app
+  #     - JP_HOST=127.0.0.1
+  #     - JP_AUTO_START=false
+  #     - WAIT_HOSTS=127.0.0.1:27017
+  #   depends_on:
+  #     - jadepool-mongodb
+  #     - jadepool-seed
+  #     - jadepool-callback
+  #   volumes:
+  #     - '/data/logs-master/logs:/usr/src/app/logs:rw'
+  #     - '/data/logs-master-pm2/logs:/root/.pm2/logs:rw'
+  # jadepool-api:
+  #   image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-api:0.11.27'
+  #   container_name: 'jadepool-api'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=dev
+  #     - JP_HOST=127.0.0.1
+  #     - WAIT_HOSTS=127.0.0.1:27017
+  #   depends_on:
+  #     - jadepool-bn
+  #   volumes:
+  #     - '/data/logs-api:/usr/src/app/logs:rw'
+  # jadepool-admin:
+  #   image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-admin:0.11.27'
+  #   container_name: 'jadepool-admin'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=dev
+  #   depends_on:
+  #     - jadepool-api
+  # jadepool-bn-agent:
+  #   image: '121.196.217.176:5000/jadepool/jadepool-bn:0.11.27-hotfix.1'
+  #   container_name: 'jadepool-bn-agent'
+  #   network_mode: 'service:saas-postgres'
+  #   restart: on-failure
+  #   environment:
+  #     - NODE_ENV=dev
+  #     - JP_MODE=app
+  #     - JP_PARAM=agent
+  #     - JP_HOST=127.0.0.1
+  #     - JP_AUTO_START=false
+  #     - WAIT_HOSTS=127.0.0.1:27017
+  #   depends_on:
+  #     - jadepool-mongodb
+  #     - jadepool-seed
+  #     - jadepool-callback
+  #     - jadepool-bn
+  #   volumes:
+  #     - '/data/logs-agent/logs:/usr/src/app/logs:rw'
+  #     - '/data/logs-agent-pm2/logs:/root/.pm2/logs:rw'
