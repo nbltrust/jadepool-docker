@@ -4,6 +4,7 @@ services:
     image: 'postgres'
     network_mode: 'bridge'
     ports:
+      - 6666:6666
       - 8500:8500
       - 5432:5432
       - 6379:6379
@@ -81,6 +82,7 @@ services:
     environment:
         - WAIT_HOSTS=127.0.0.1:6379, 127.0.0.1:27017
         - NODE_ENV=dev
+        - JP_SECRET=22b21f748ecd6a735d3c4a53b87db8e6
   jadepool-mongodb:
     image: 'mongo:3.6'
     container_name: 'jadepool-mongodb'
@@ -114,7 +116,7 @@ services:
         timeout: 10s
         retries: 5
   jadepool-bn:
-    image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-bn:0.13.0-alpha.3'
+    image: 'jadepool-hub:0.13.8-beta.0'
     container_name: 'jadepool-bn'
     network_mode: 'service:saas-postgres'
     restart: on-failure
@@ -133,7 +135,7 @@ services:
       - '/data/logs-master/logs:/usr/src/app/logs:rw'
       - '/data/logs-master-pm2/logs:/root/.pm2/logs:rw'
   jadepool-api:
-    image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-api:0.13.0-alpha.2'
+    image: 'jadepool-hub-admin:0.13.8-beta.0'
     container_name: 'jadepool-api'
     network_mode: 'service:saas-postgres'
     restart: on-failure
@@ -147,7 +149,7 @@ services:
     volumes:
       - '/data/logs-api:/usr/src/app/logs:rw'
   jadepool-admin:
-    image: 'registry.cn-hangzhou.aliyuncs.com/jadepool/jadepool-admin:0.13.0-alpha.3'
+    image: 'jadepool-hub-admin-fe:0.13.8-beta.0'
     container_name: 'jadepool-admin'
     network_mode: 'service:saas-postgres'
     restart: on-failure
