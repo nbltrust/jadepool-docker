@@ -61,6 +61,7 @@ services:
         retries: 5
     environment:
         - WAIT_HOSTS=127.0.0.1:5432, 127.0.0.1:6666
+        - JP_SECRET=22b21f748ecd6a735d3c4a53b87db8e6
   saas-frontend:
     image: 'saas-frontend:V1.12.0'
     network_mode: 'service:saas-postgres'
@@ -123,6 +124,7 @@ services:
       - JP_HOST=127.0.0.1
       - JP_AUTO_START=false
       - WAIT_HOSTS=127.0.0.1:27017
+      - JP_SECRET=22b21f748ecd6a735d3c4a53b87db8e6
     depends_on:
       - jadepool-mongodb
       - jadepool-seed
@@ -139,6 +141,7 @@ services:
       - NODE_ENV=dev
       - JP_HOST=127.0.0.1
       - WAIT_HOSTS=127.0.0.1:27017
+      - JP_SECRET=22b21f748ecd6a735d3c4a53b87db8e6
     depends_on:
       - jadepool-bn
     volumes:
