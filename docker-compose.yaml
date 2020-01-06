@@ -55,6 +55,7 @@ services:
     restart: on-failure
     volumes:
       - '/data/logs-saas:/usr/src/app/log'
+      - './dev.yaml:/usr/src/app/config/dev.yaml'
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:8091/api/test"]
         interval: 30s
