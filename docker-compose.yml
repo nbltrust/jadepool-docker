@@ -50,7 +50,7 @@ services:
     network_mode: 'service:saas-postgres'
     container_name: 'saas-role-service'
     environment:
-      - WAIT_HOSTS=saas-consul:8500
+      - WAIT_HOSTS=127.0.0.1:8500
   
   saas-backend:
     image: 'saas-backend:V1.12.1'
@@ -66,7 +66,7 @@ services:
         timeout: 10s
         retries: 5
     environment:
-        - WAIT_HOSTS=127.0.0.1:5432, saas-role-service:6666
+        - WAIT_HOSTS=127.0.0.1:5432, 127.0.0.1:6666
 
   # saas-frontend:
   #   image: '121.196.217.176:5000/saas/saas-frontend:V1.1.0'
