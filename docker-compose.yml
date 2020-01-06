@@ -6,13 +6,14 @@ services:
     ports:
       - 5432:5432
       - 6379:6379
+      - 8500:8500
       - 8091:8091
       - 8092:8092
       - 8093:8093
       - 8094:8094
       - 6666:6666
       - 3003:3003
-      - 3009:3009
+      - 3004:3004
     container_name: 'saas-postgres'
     volumes:
       - '/data/db-postgres/db:/var/lib/postgresql/data/:rw'
@@ -48,10 +49,8 @@ services:
     image: 'jadepool-service-role:0.1.5'
     network_mode: 'service:saas-postgres'
     container_name: 'saas-role-service'
-    volumes:
-      - './initSaasRole:/usr/src/app/initSaasRole'
     environment:
-        - WAIT_HOSTS=saas-consul:8500
+      - WAIT_HOSTS=saas-consul:8500
   
   saas-backend:
     image: 'saas-backend:V1.12.1'
