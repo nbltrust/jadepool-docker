@@ -74,7 +74,7 @@ services:
     depends_on:
       - saas-backend
   saas-role:
-    image: 'saas-role:V0.5.0'
+    image: 'jadepool-service-role:0.1.5'
     network_mode: 'service:saas-postgres'
     container_name: 'saas-role'
     environment:
