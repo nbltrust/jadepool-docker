@@ -10,7 +10,9 @@ services:
       - 8092:8092
       - 8093:8093
       - 8094:8094
-      - 3003:80
+      - 6666:6666
+      - 3003:3003
+      - 3009:3009
     container_name: 'saas-postgres'
     volumes:
       - '/data/db-postgres/db:/var/lib/postgresql/data/:rw'
@@ -34,13 +36,23 @@ services:
         timeout: 5s
         retries: 5
 
+  saas-role-service:
+    image: 'jadepool-service-role:V0.1.5'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-role-service'
+    volumes:
+      - './initSaasRole:/usr/src/app/initSaasRole'
+    onrun:
+      - 'cd initSaasRole && npm i && node upsert.js && node upsert.js saas-admin'
+  
   saas-backend:
-    image: '121.196.217.176:5000/saas/saas-backend:V1.1.0'
+    image: 'saas-backend:V1.12.1'
     network_mode: 'service:saas-postgres'
     container_name: 'saas-backend'
     restart: on-failure
     volumes:
       - '/data/logs-saas:/usr/src/app/log'
+      - './docker.yaml:/usr/src/app/config/docker.yaml'
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:8091/api/test"]
         interval: 30s
@@ -49,10 +61,10 @@ services:
     environment:
         - WAIT_HOSTS=127.0.0.1:5432
 
-  saas-frontend:
-    image: '121.196.217.176:5000/saas/saas-frontend:V1.1.0'
-    network_mode: 'service:saas-postgres'
-    container_name: 'saas-frontend'
-    depends_on:
-      - saas-backend
+  # saas-frontend:
+  #   image: '121.196.217.176:5000/saas/saas-frontend:V1.1.0'
+  #   network_mode: 'service:saas-postgres'
+  #   container_name: 'saas-frontend'
+  #   depends_on:
+  #     - saas-backend
 

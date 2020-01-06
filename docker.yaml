@@ -1,0 +1,91 @@
+database:
+  host: localhost
+  port: 5432
+  name: saas
+  user: saas
+  pass: 123456
+  type: postgres
+
+redis:
+  addr: localhost:6379
+  pass: ""
+  db: 0
+
+email:
+  host: smtp.gmail.com
+  port: 465
+  user: jadepool.saas.dev@jadepool.io
+  pass: Jadepoolsaas2019
+  from: jadepool.saas.dev@jadepool.io
+  ssl: true
+
+sms:
+  china:
+    app_id: 12345
+    app_key: xxxxx292893dd6bf0d3baac96a71858d
+  internation:
+    app_id: 12345
+    app_key: xxxxx176ad40bb5c75d5a761aac2855e
+  zhSignature: 瑶池
+  enSignature: Jadepool
+
+jpsrv:
+  listen_addr: ":8091"
+  log_dir: ""
+  log_level: "DEBUG"
+  pri_key: "bf12996feeaa2977b6ca0d33a0e8bd2ccfc4844c6f8a7e6d15c099f8da4a255c"
+  noti_url: "http://127.0.0.1:8091/api/order/noti"
+  jadepool_appid: "saas"
+  worker_interval: 3 # interval for worker, seconds
+  workerNum: 1
+  multi_hotwallet_enable: true
+  dont_write_event: false
+
+addrbook:
+  host: "127.0.0.1"
+  port: 7001
+  appid: "saas"
+  pri_key: "bf12996feeaa2977b6ca0d33a0e8bd2ccfc4844c6f8a7e6d15c099f8da4a255c"
+  pub_key: "03ace32532c90652e1bae916248e427a7ab10aeeea1067949669a3f4da10965ef9"
+
+apisrv:
+  listen_addr: ":8092"
+  log_dir: ""
+  log_level: "DEBUG"
+  worker_interval: 3 # interval for worker, seconds
+  workerNum: 1
+  timestampDeviation: 300 # seconds
+  api_switch: true
+
+superadmin:
+  listen_addr: ":8093"
+  log_dir: ""
+  log_level: "DEBUG"
+  token_pass: "superadmin_nbltrust"
+  access_control_enable: true
+  service_role_url: "http://127.0.0.1:6666"
+  service_name: "jadepool-saas-admin"
+  dont_write_event: false
+
+saasadmin:
+  listen_addr: ":8094"
+  log_dir: ""
+  log_level: "DEBUG"
+  token_pass: "saasadmin_nbltrust"
+  price_url: "https://app.cybex.io/coinmarket_price"
+  price_key: "P5K14upLe8CdpU4BqnCxpnmpNNZph2JfKxFdWcsTYfAz6"
+  coin_logo_url: "https://cybex-assets.cybex.io/asset-symbols/"
+  email_logo_url: "https://cybex-assets.cybex.io/saas/logo.png"
+  saas_web_url: "http://127.0.0.1:3000"
+  access_control_enable: false
+  service_role_url: "http://127.0.0.1:6666"
+  service_name: "jadepool-saas"
+  useSeed: 0
+  dont_write_event: false
+
+ordersrv:
+  log_dir: ""
+  log_level: "DEBUG"
+  worker_interval: 3 # interval for worker, seconds
+  workerNum: 1
+  
