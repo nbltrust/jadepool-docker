@@ -1,0 +1,58 @@
+version: '3.5'
+services:
+  saas-postgres:
+    image: 'postgres'
+    network_mode: 'bridge'
+    ports:
+      - 5432:5432
+      - 6379:6379
+      - 8091:8091
+      - 8092:8092
+      - 8093:8093
+      - 8094:8094
+      - 3003:80
+    container_name: 'saas-postgres'
+    volumes:
+      - '/data/db-postgres/db:/var/lib/postgresql/data/:rw'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+        - POSTGRES_USER=saas
+        - POSTGRES_PASSWORD=123456
+        - POSTGRES_DB=saas
+
+  saas-redis:
+    image: 'redis'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-redis'
+    healthcheck:
+        test: ["CMD", "redis-cli","ping"]
+        interval: 30s
+        timeout: 5s
+        retries: 5
+
+  saas-backend:
+    image: '121.196.217.176:5000/saas/saas-backend:V1.1.0'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-backend'
+    restart: on-failure
+    volumes:
+      - '/data/logs-saas:/usr/src/app/log'
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8091/api/test"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    environment:
+        - WAIT_HOSTS=127.0.0.1:5432
+
+  saas-frontend:
+    image: '121.196.217.176:5000/saas/saas-frontend:V1.1.0'
+    network_mode: 'service:saas-postgres'
+    container_name: 'saas-frontend'
+    depends_on:
+      - saas-backend
+
